@@ -1,0 +1,15 @@
+---
+- name: Deploy app
+  hosts: all
+  remote_user: root
+
+  tasks:
+    - name: Copy app.php
+      copy: 
+        src: ./web/app.php
+        dest: "{{ site_dir }}/web/app.php"
+
+    - name: Restart container
+      shell:
+        cmd: docker-compose restart
+        chdir: ~/app/

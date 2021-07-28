@@ -1,0 +1,52 @@
+---
+- name: Install the Dependencies
+  yum:
+    name: 
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+
+- name: Enable docker-ce-stable
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: Install Docker packages
+  yum:
+    name: 
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+
+- name: Install Docker Compose
+  get_url: 
+    url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 'u+x,g+x'
+
+- name: Start docker
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Create app directory
+  file:
+    path: ~/app
+    state: directory
+    mode: '0755'
+
+- name: Copy Dockerfile
+  template: 
+    src: Dockerfile
+    dest: ~/app/
+
+- name: Copy php.ini
+  template: 
+    src: php.ini
+    dest: ~/app/
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml
+    dest: ~/app/
+

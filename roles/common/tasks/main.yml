@@ -1,0 +1,26 @@
+---
+- name: Create the GPG key for PostgreSQL
+  copy: 
+    src: RPM-GPG-KEY-PGDG
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-PGDG
+
+- name: Install the repository RPM
+  yum: 
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+
+- name: Copy the NGINX repository definition
+  copy:
+    src: nginx.repo
+    dest: /etc/yum.repos.d/nginx.repo
+
+- name: Create the GPG key for NGINX
+  copy: 
+    src: RPM-GPG-KEY-NGINX
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-NGINX
+
+- name: Firewalld service state
+  service:
+    name: firewalld
+    state: started
+    enabled: yes

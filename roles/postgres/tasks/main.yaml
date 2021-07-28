@@ -1,0 +1,93 @@
+---
+- name: Install postgresql-server
+  yum: 
+    name: "postgresql{{ pg_version }}-server"
+    state: present
+
+- name: Install the Dependencies for PostgreSQL
+  yum: 
+    name: 
+      - python-psycopg2
+      - python-ipaddress
+    state: present
+
+- name: Check if PostgreSQL database is initialized
+  stat:
+    path: "/var/lib/pgsql/{{ pg_version }}/data/PG_VERSION"
+  register: pgdata_dir_version
+
+- name: Initialize PostgreSQL database.
+  command: "postgresql-{{ pg_version }}-setup initdb"
+  when: not pgdata_dir_version.stat.exists
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Be sure postgresql is running and enabled
+  service:
+    name: "postgresql-{{ pg_version }}"
+    state: started
+    enabled: yes
+
+- name: Ensure the default Apache port is 8080
+  lineinfile:
+    path: /var/lib/pgsql/{{ pg_version }}/data/postgresql.conf
+    regexp: '^listen_addresses  '
+    insertafter: '^#listen_addresses '
+    line: listen_addresses = '*'
+
+- name: Create database
+  postgresql_db:
+    state: present
+    name: "{{ db_name }}"
+  become: yes
+  become_user: postgres
+
+- name: Create db user
+  postgresql_user:
+    state: present
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+  become: yes
+  become_user: postgres
+
+- name: Grant db user access to db
+  postgresql_privs:
+    type: database
+    database: "{{ db_name }}"
+    roles: "{{ db_user }}"
+    grant_option: no
+    privs: all
+  become: yes
+  become_user: postgres
+
+- name: Allow md5 connection for the db user
+  postgresql_pg_hba:
+    dest: "/var/lib/pgsql/{{ pg_version }}/data/pg_hba.conf"
+    contype: host
+    databases: all
+    method: md5
+    users: "{{ db_user }}"
+    source: 0.0.0.0/0
+    create: true
+  become: yes
+  become_user: postgres
+  notify: restart postgresql
+
+- name: Create table
+  postgresql_table:
+    db: "{{ db_name }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    login_host: localhost
+    table: author
+    columns:
+    - id serial
+    - name varchar(100)
+
+- name: Insert data
+  postgresql_query:
+    query: TRUNCATE TABLE author RESTART IDENTITY; INSERT INTO author (name) VALUES ('John'), ('Alex');
+    db: "{{ db_name }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    login_host: localhost

@@ -1,0 +1,9 @@
+---
+# PostgreSQL related variables
+pg_version: 13
+db_name: sre
+db_user: sre
+db_password: sre
+
+# NGINX
+site_dir: /var/www/sre/
