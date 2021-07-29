@@ -19,6 +19,12 @@
     src: RPM-GPG-KEY-NGINX
     dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-NGINX
 
+- name: Install git
+  yum:
+    name: git
+    state: present
+    update_cache: yes
+
 - name: Firewalld service state
   service:
     name: firewalld

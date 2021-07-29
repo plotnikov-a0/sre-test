@@ -4,12 +4,18 @@
   remote_user: root
 
   tasks:
-    - name: Copy app.php
-      copy: 
-        src: ./web/app.php
-        dest: "{{ site_dir }}/web/app.php"
+    - name: Copy repo
+      git: 
+        repo: https://github.com/plotnikov-a0/sre-app.git
+        dest: ~/build/
 
-    - name: Restart container
+    - name: Copy app.php to work directory
+      copy:
+        src: ~/build/web/app.php
+        dest: /var/www/sre/web/app.php
+        remote_src: yes
+
+    - name: Build and run container
       shell:
-        cmd: docker-compose restart
-        chdir: ~/app/
+        cmd: docker-compose up -d --build
+        chdir: ~/build/

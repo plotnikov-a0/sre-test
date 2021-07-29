@@ -14,18 +14,24 @@
   remote_user: root
 
   tasks:
-    - name: Create web directory
+    - name: Copy repo
+      git: 
+        repo: https://github.com/plotnikov-a0/sre-app.git
+        dest: ~/build/
+
+    - name: Create site directory
       file:
-        path: "{{ site_dir }}/web"
+        path: /var/www/sre/web
         state: directory
         mode: '0755'
 
-    - name: Copy app.php
-      copy: 
-        src: ./web/app.php
-        dest: "{{ site_dir }}/web/app.php"
+    - name: Copy app.php to work directory
+      copy:
+        src: ~/build/web/app.php
+        dest: /var/www/sre/web/app.php
+        remote_src: yes
 
-    - name: Run docker-compose
+    - name: Build and run container
       shell:
         cmd: docker-compose up -d
-        chdir: ~/app/
+        chdir: ~/build/

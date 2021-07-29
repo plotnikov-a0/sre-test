@@ -28,25 +28,3 @@
     name: docker
     state: started
     enabled: yes
-
-- name: Create app directory
-  file:
-    path: ~/app
-    state: directory
-    mode: '0755'
-
-- name: Copy Dockerfile
-  template: 
-    src: Dockerfile
-    dest: ~/app/
-
-- name: Copy php.ini
-  template: 
-    src: php.ini
-    dest: ~/app/
-
-- name: Copy docker-compose.yml
-  template:
-    src: docker-compose.yml
-    dest: ~/app/
-
