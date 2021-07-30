@@ -13,14 +13,14 @@
   become: yes
 
 - name: Copy nginx configuration
-  copy: 
+  template: 
     src: app-defaults
     dest: /etc/nginx/app-defaults
   notify: restart nginx
   become: yes
 
 - name: Copy nginx configuration
-  copy: 
+  template: 
     src: app.conf
     dest: /etc/nginx/conf.d/default.conf
   notify: restart nginx

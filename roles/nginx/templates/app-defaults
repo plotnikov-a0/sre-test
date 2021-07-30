@@ -1,7 +1,7 @@
 # from https://symfony.com/doc/current/setup/web_server_configuration.html#nginx
 
 listen 80;
-root /var/www/sre/web;
+root {{ site_dir }}/web;
 
 location / {
     # try to serve file directly, fallback to index.php

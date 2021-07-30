@@ -22,9 +22,6 @@
 - name: Initialize PostgreSQL database.
   command: "postgresql-{{ pg_version }}-setup initdb"
   when: not pgdata_dir_version.stat.exists
-#  vars:
-#    ansible_ssh_pipelining: true
-#  become_user: postgres
   become: yes
 
 - name: Be sure postgresql is running and enabled

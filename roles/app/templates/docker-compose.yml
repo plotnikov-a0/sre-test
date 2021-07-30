@@ -4,9 +4,9 @@ services:
     php:
         build: ./
         restart: always
-        working_dir: /var/www/sre/
+        working_dir: "{{ site_dir }}"
         volumes:
-           - /var/www/sre/web/:/var/www/sre/web/
+           - "{{ site_dir }}/web/:{{ site_dir }}/web/"
         ports:
            - "9000:9000"
         environment:

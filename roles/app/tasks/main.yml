@@ -2,51 +2,51 @@
 - name: Delete content & directory
   file:
     state: absent
-    path: /tmp/build/repo/
+    path: "{{ build_dir }}/repo/"
 
 - name: Copy remote repository
   git: 
     repo: https://github.com/muxx/sre-hello-world.git
-    dest: /tmp/build/repo/
+    dest: "{{ build_dir }}/repo/"
 
-- name: Create site directory
+- name: Create app directory
   file:
-    path: /var/www/sre/web
+    path: "{{ site_dir }}/web"
     state: directory
     mode: '0755'
   become: yes
 
-- name: Copy app.php to site directory
+- name: Copy app.php to app directory
   copy:
-    src: /tmp/build/repo/web/app.php
-    dest: /var/www/sre/web/app.php
+    src: "{{ build_dir }}/repo/web/app.php"
+    dest: "{{ site_dir }}/web/app.php"
     remote_src: yes
   become: yes
 
 - name: Copy Dockerfile to work directory
   copy:
-    src: /tmp/build/repo/docker/images/php/Dockerfile
-    dest: /tmp/build/Dockerfile
+    src: "{{ build_dir }}/repo/docker/images/php/Dockerfile"
+    dest: "{{ build_dir }}/Dockerfile"
     remote_src: yes
 
 - name: Copy php.ini to work directory
   copy:
-    src: /tmp/build/repo/docker/images/php/php.ini
-    dest: /tmp/build/php.ini
+    src: "{{ build_dir }}/repo/docker/images/php/php.ini"
+    dest: "{{ build_dir }}/php.ini"
     remote_src: yes
 
 - name: Copy .env to work directory
-  copy:
+  template:
     src: ".env"
-    dest: /tmp/build/.env
+    dest: "{{ build_dir }}/.env"
 
 - name: Copy docker-compose.yml to work directory
-  copy:
+  template:
     src: docker-compose.yml
-    dest: /tmp/build/docker-compose.yml
+    dest: "{{ build_dir }}/docker-compose.yml"
 
 - name: Build and run container
   shell:
     cmd: /usr/local/bin/docker-compose up -d --build
-    chdir: /tmp/build/
+    chdir: "{{ build_dir }}/"
   become: yes
