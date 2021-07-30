@@ -3,6 +3,7 @@
   yum: 
     name: "postgresql{{ pg_version }}-server"
     state: present
+  become: yes
 
 - name: Install the Dependencies for PostgreSQL
   yum: 
@@ -10,30 +11,36 @@
       - python-psycopg2
       - python-ipaddress
     state: present
+  become: yes
 
 - name: Check if PostgreSQL database is initialized
   stat:
     path: "/var/lib/pgsql/{{ pg_version }}/data/PG_VERSION"
   register: pgdata_dir_version
+  become: yes
 
 - name: Initialize PostgreSQL database.
   command: "postgresql-{{ pg_version }}-setup initdb"
   when: not pgdata_dir_version.stat.exists
-  vars:
-    ansible_ssh_pipelining: true
+#  vars:
+#    ansible_ssh_pipelining: true
+#  become_user: postgres
+  become: yes
 
 - name: Be sure postgresql is running and enabled
   service:
     name: "postgresql-{{ pg_version }}"
     state: started
     enabled: yes
+  become: yes
 
-- name: Ensure the default Apache port is 8080
+- name: Allow connection from all interfaces
   lineinfile:
     path: /var/lib/pgsql/{{ pg_version }}/data/postgresql.conf
     regexp: '^listen_addresses  '
     insertafter: '^#listen_addresses '
     line: listen_addresses = '*'
+  become: yes
 
 - name: Create database
   postgresql_db:

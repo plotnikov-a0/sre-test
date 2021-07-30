@@ -1,21 +1,6 @@
 ---
 - name: Deploy app
   hosts: all
-  remote_user: root
 
-  tasks:
-    - name: Copy repo
-      git: 
-        repo: https://github.com/plotnikov-a0/sre-app.git
-        dest: ~/build/
-
-    - name: Copy app.php to work directory
-      copy:
-        src: ~/build/web/app.php
-        dest: /var/www/sre/web/app.php
-        remote_src: yes
-
-    - name: Build and run container
-      shell:
-        cmd: docker-compose up -d --build
-        chdir: ~/build/
+  roles:
+    - app

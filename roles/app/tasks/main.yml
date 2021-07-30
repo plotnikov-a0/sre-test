@@ -1,0 +1,52 @@
+---
+- name: Delete content & directory
+  file:
+    state: absent
+    path: /tmp/build/repo/
+
+- name: Copy remote repository
+  git: 
+    repo: https://github.com/muxx/sre-hello-world.git
+    dest: /tmp/build/repo/
+
+- name: Create site directory
+  file:
+    path: /var/www/sre/web
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Copy app.php to site directory
+  copy:
+    src: /tmp/build/repo/web/app.php
+    dest: /var/www/sre/web/app.php
+    remote_src: yes
+  become: yes
+
+- name: Copy Dockerfile to work directory
+  copy:
+    src: /tmp/build/repo/docker/images/php/Dockerfile
+    dest: /tmp/build/Dockerfile
+    remote_src: yes
+
+- name: Copy php.ini to work directory
+  copy:
+    src: /tmp/build/repo/docker/images/php/php.ini
+    dest: /tmp/build/php.ini
+    remote_src: yes
+
+- name: Copy .env to work directory
+  copy:
+    src: ".env"
+    dest: /tmp/build/.env
+
+- name: Copy docker-compose.yml to work directory
+  copy:
+    src: docker-compose.yml
+    dest: /tmp/build/docker-compose.yml
+
+- name: Build and run container
+  shell:
+    cmd: /usr/local/bin/docker-compose up -d --build
+    chdir: /tmp/build/
+  become: yes

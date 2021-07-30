@@ -8,6 +8,7 @@
 
 - name: Enable docker-ce-stable
   shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  become: yes
 
 - name: Install Docker packages
   yum:
@@ -16,15 +17,18 @@
       - docker-ce-cli
       - containerd.io
     state: present
+  become: yes
 
 - name: Install Docker Compose
   get_url: 
     url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
     dest: /usr/local/bin/docker-compose
     mode: 'u+x,g+x'
+  become: yes
 
 - name: Start docker
   service:
     name: docker
     state: started
     enabled: yes
+  become: yes

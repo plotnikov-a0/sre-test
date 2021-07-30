@@ -3,24 +3,28 @@
   yum: 
     name: nginx
     state: present
+  become: yes
 
 - name: Create site directory
   file:
     path: "{{ site_dir }}"
     state: directory
     mode: '0755'
+  become: yes
 
 - name: Copy nginx configuration
   copy: 
     src: app-defaults
     dest: /etc/nginx/app-defaults
   notify: restart nginx
+  become: yes
 
 - name: Copy nginx configuration
   copy: 
     src: app.conf
     dest: /etc/nginx/conf.d/default.conf
   notify: restart nginx
+  become: yes
 
 - name: Insert firewalld rule for nginx
   firewalld:
@@ -28,9 +32,11 @@
     permanent: true 
     state: enabled
     immediate: yes
+  become: yes
 
 - name: Be sure nginx is running and enabled
   service:
     name: nginx
     state: started
     enabled: yes
+  become: yes

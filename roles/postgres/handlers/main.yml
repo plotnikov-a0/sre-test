@@ -3,3 +3,4 @@
   service:
     name: "postgresql-{{ pg_version }}"
     state: restarted
+  become: yes

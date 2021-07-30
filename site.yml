@@ -1,37 +1,10 @@
 ---
 - name: Install Postgres, Nginx, and PHP-FPM
   hosts: all
-  remote_user: root
 
   roles:
     - common
     - postgres
     - nginx
     - docker
-
-- name: Deploy app
-  hosts: all
-  remote_user: root
-
-  tasks:
-    - name: Copy repo
-      git: 
-        repo: https://github.com/plotnikov-a0/sre-app.git
-        dest: ~/build/
-
-    - name: Create site directory
-      file:
-        path: /var/www/sre/web
-        state: directory
-        mode: '0755'
-
-    - name: Copy app.php to work directory
-      copy:
-        src: ~/build/web/app.php
-        dest: /var/www/sre/web/app.php
-        remote_src: yes
-
-    - name: Build and run container
-      shell:
-        cmd: docker-compose up -d
-        chdir: ~/build/
+    - app
